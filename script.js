@@ -1,6 +1,8 @@
 const vehicles = {
   sakura: {
     name: 'Nissan Sakura', length: 3395, width: 1475,
+    svg: 'assets/vehicles/nissan-sakura.svg',
+    outlineBounds: { left: .08, right: .914, top: .001, bottom: .994 },
     source: 'Nissan Motor Co., Ltd. (2022)',
     sourceUrl: 'https://history.nissan.co.jp/ARCHIVES/PDF/SAKURA/KE0/20220520/sakura_specsheet.pdf',
     outlineCitation: 'CarCadBlocks (no date); 3DModels.org (no date b)',
@@ -14,6 +16,8 @@ const vehicles = {
   },
   ioniq6: {
     name: 'Hyundai IONIQ 6', length: 4925, width: 1880,
+    svg: 'assets/vehicles/hyundai-ioniq-6.svg',
+    outlineBounds: { left: .095, right: .899, top: .001, bottom: .998 },
     source: 'Hyundai Motor Europe (no date)',
     sourceUrl: 'https://www.hyundai.com/eu/en/models/ioniq-6/technical-data-downloads.html',
     outlineCitation: 'Hyundai Motor Nederland (no date); 3D CAD Browser (no date)',
@@ -27,6 +31,8 @@ const vehicles = {
   },
   ev3: {
     name: 'Kia EV3 Air', length: 4300, width: 1850,
+    svg: 'assets/vehicles/kia-ev3-air.svg',
+    outlineBounds: { left: .094, right: .899, top: .001, bottom: .996 },
     source: 'Kia UK (no date)',
     sourceUrl: 'https://www.kia.com/uk/new-cars/ev3/specification/',
     outlineCitation: 'Kia Global Media Center (no date); 3DModels.org (no date a)',
@@ -40,6 +46,8 @@ const vehicles = {
   },
   vf9: {
     name: 'VinFast VF 9 Eco', length: 5119, width: 2004,
+    svg: 'assets/vehicles/vinfast-vf9.svg',
+    outlineBounds: { left: .083, right: .911, top: .006, bottom: .996 },
     source: 'VinFast (no date a)',
     sourceUrl: 'https://vinfastauto.com/vn_vi/cau-hoi-thuong-gap/cau-hoi-xe-o-to/san-pham/vf-9',
     outlineCitation: 'VinFast (no date b); Giang Trần (2024)',
@@ -53,6 +61,8 @@ const vehicles = {
   },
   x9: {
     name: 'XPeng X9', length: 5316, width: 1988,
+    svg: 'assets/vehicles/xpeng-x9.svg',
+    outlineBounds: { left: .094, right: .899, top: .001, bottom: .996 },
     source: 'XPeng (2026)',
     sourceUrl: 'https://www.xiaopeng.com/x9_2026/configuration.html?forcePlat=h5',
     outlineCitation: 'XPeng Malaysia (no date); 3DModels.org (no date c)',
@@ -124,8 +134,11 @@ const el = {
   layerTabs: [...document.querySelectorAll('.layer-tab')],
   stage: document.querySelector('#mapStage'),
   car: document.querySelector('#vehicleGraphic'),
-  outline: document.querySelector('#vehicleOutline'),
-  glass: document.querySelector('#vehicleGlass'),
+  vehicleImage: document.querySelector('#vehicleImage'),
+  visibleGraphic: document.querySelector('#visibleBoundaryGraphic'),
+  digitalGraphic: document.querySelector('#digitalBoundaryGraphic'),
+  orientation: document.querySelector('#mapOrientation'),
+  reportedLabel: document.querySelector('#reportedBoundaryLabel'),
   dimensions: document.querySelector('#selectedDimensions'),
   outlineEvidence: document.querySelector('#outlineEvidence'),
   outlineLinks: document.querySelector('#outlineLinks'),
@@ -147,7 +160,6 @@ const el = {
   panelStatus: document.querySelector('#panelStatus'),
   panelTitle: document.querySelector('#panelTitle'),
   panelDescription: document.querySelector('#panelDescription'),
-  panelSource: document.querySelector('#panelSource'),
   panelMethod: document.querySelector('#panelMethod'),
   panelLimitation: document.querySelector('#panelLimitation'),
   panelLinks: document.querySelector('#panelLinks')
@@ -171,8 +183,7 @@ function updateVehicle() {
   el.dimensions.textContent = `${vehicle.length.toLocaleString('en-GB')} × ${vehicle.width.toLocaleString('en-GB')} mm`;
   el.outlineEvidence.textContent = `${vehicle.outlineText} (${vehicle.outlineCitation}).`;
   el.outlineLinks.replaceChildren(...vehicle.outlineLinks.map(([label, url]) => createLink(label, url)));
-  el.outline.setAttribute('d', vehicle.bodyPath);
-  el.glass.setAttribute('d', vehicle.glassPath);
+  el.vehicleImage.setAttribute('href', vehicle.svg);
   renderGeometry();
   updatePanel();
 }
@@ -196,7 +207,6 @@ function updatePanel() {
   el.panelStatus.textContent = layer.status;
   el.panelTitle.textContent = layer.title;
   el.panelDescription.textContent = layer.description;
-  el.panelSource.textContent = layer.sourceMode === 'vehicle' ? `${vehicle.source}; ${vehicle.outlineCitation}` : layer.source;
   el.panelMethod.textContent = layer.method;
   el.panelLimitation.textContent = layer.limitation;
   el.stateMessage.textContent = layer.message || '';
@@ -208,33 +218,90 @@ function clearance(value) {
   return value >= 0 ? mm(value) : `−${mm(Math.abs(value))}`;
 }
 
+function roundedRectPath(left, top, right, bottom, radius) {
+  const r = Math.min(radius, (right - left) / 2, (bottom - top) / 2);
+  return `M${left + r} ${top}H${right - r}Q${right} ${top} ${right} ${top + r}V${bottom - r}Q${right} ${bottom} ${right - r} ${bottom}H${left + r}Q${left} ${bottom} ${left} ${bottom - r}V${top + r}Q${left} ${top} ${left + r} ${top}Z`;
+}
+
 function renderGeometry() {
   const vehicle = vehicles[selectedVehicle];
   const bayLength = Number(el.bayLength.value);
   const bayWidth = Number(el.bayWidth.value);
-  const scale = .095;
+  const scale = .114;
   const carHeight = vehicle.length * scale;
   const carWidth = vehicle.width * scale;
   const bayHeight = bayLength * scale;
   const bayPixelWidth = bayWidth * scale;
   const cx = 450;
-  const cy = 350;
+  const cy = 410;
   const scaleX = carWidth / 100;
   const scaleY = carHeight / 200;
 
   el.car.setAttribute('transform', `translate(${cx} ${cy}) scale(${scaleX} ${scaleY}) translate(-50 -100)`);
+
+  const carTop = cy - carHeight / 2;
+  const carBottom = cy + carHeight / 2;
+  const leftX = cx - carWidth / 2;
+  const rightX = cx + carWidth / 2;
+  const bounds = vehicle.outlineBounds;
+  const bodyLeft = leftX + carWidth * bounds.left;
+  const bodyRight = leftX + carWidth * bounds.right;
+  const bodyTop = carTop + carHeight * bounds.top;
+  const bodyBottom = carTop + carHeight * bounds.bottom;
+  const bodyWidth = bodyRight - bodyLeft;
+  const bodyHeight = bodyBottom - bodyTop;
+  const visibleInnerPad = 13;
+  const visibleOuterPadX = Math.max(58, bodyWidth * .3);
+  const visibleOuterPadY = Math.max(40, bodyHeight * .07);
+  const innerLeft = bodyLeft - visibleInnerPad;
+  const innerRight = bodyRight + visibleInnerPad;
+  const innerTop = bodyTop - visibleInnerPad;
+  const innerBottom = bodyBottom + visibleInnerPad;
+  const outerLeft = Math.max(24, bodyLeft - visibleOuterPadX);
+  const outerRight = Math.min(876, bodyRight + visibleOuterPadX);
+  const outerTop = Math.max(70, bodyTop - visibleOuterPadY);
+  const outerBottom = Math.min(774, bodyBottom + visibleOuterPadY);
+  const visibleRing = el.visibleGraphic.querySelector('#visibleBoundaryRing');
+  visibleRing.setAttribute('d', `${roundedRectPath(outerLeft, outerTop, outerRight, outerBottom, 104)} ${roundedRectPath(innerLeft, innerTop, innerRight, innerBottom, 68)}`);
+  el.visibleGraphic.querySelector('text').setAttribute('y', 30);
+  el.orientation.setAttribute('x', cx);
+  el.orientation.setAttribute('y', 58);
+  el.orientation.setAttribute('text-anchor', 'middle');
+
+  const digitalGapX = Math.max(62, carWidth * .38);
+  const digitalGapY = Math.max(46, carHeight * .1);
+  const digitalLeft = leftX - digitalGapX;
+  const digitalRight = rightX + digitalGapX;
+  const digitalTop = Math.max(70, bodyTop - digitalGapY);
+  const digitalBottom = Math.min(756, bodyBottom + digitalGapY);
+  const digitalRect = el.digitalGraphic.querySelector('rect');
+  digitalRect.setAttribute('x', digitalLeft);
+  digitalRect.setAttribute('y', digitalTop);
+  digitalRect.setAttribute('width', digitalRight - digitalLeft);
+  digitalRect.setAttribute('height', digitalBottom - digitalTop);
+  digitalRect.setAttribute('rx', Math.min(110, (digitalRight - digitalLeft) * .28));
+  el.digitalGraphic.querySelector('path').setAttribute('d', `M${cx} ${digitalTop}V${digitalTop + 42}M${digitalRight} ${cy}H${digitalRight - 42}M${cx} ${digitalBottom}V${digitalBottom - 42}M${digitalLeft} ${cy}H${digitalLeft + 42}`);
+  const digitalCircles = el.digitalGraphic.querySelectorAll('circle');
+  [[cx, digitalTop], [digitalRight, cy], [cx, digitalBottom], [digitalLeft, cy]].forEach(([x, y], index) => {
+    digitalCircles[index].setAttribute('cx', x);
+    digitalCircles[index].setAttribute('cy', y);
+  });
+  el.digitalGraphic.querySelector('text').setAttribute('y', 786);
+
   el.parkingBay.setAttribute('x', cx - bayPixelWidth / 2);
   el.parkingBay.setAttribute('y', cy - bayHeight / 2);
   el.parkingBay.setAttribute('width', bayPixelWidth);
   el.parkingBay.setAttribute('height', bayHeight);
 
-  const rearY = cy + carHeight / 2;
-  const leftX = cx - carWidth / 2;
-  const rightX = cx + carWidth / 2;
-  el.rearLeft.setAttribute('transform', `translate(${leftX} ${rearY - 7})`);
-  el.rearRight.setAttribute('transform', `translate(${rightX} ${rearY - 7})`);
-  el.rearConnectorLeft.setAttribute('d', `M${leftX} ${rearY + 14}Q${leftX - 18} ${rearY + 36} ${leftX - 5} 638`);
-  el.rearConnectorRight.setAttribute('d', `M${rightX} ${rearY + 14}Q${rightX + 18} ${rearY + 36} ${rightX + 5} 638`);
+  const rearY = bodyBottom - 9;
+  const rearLeftX = bodyLeft;
+  const rearRightX = bodyRight;
+  el.rearLeft.setAttribute('transform', `translate(${rearLeftX} ${rearY})`);
+  el.rearRight.setAttribute('transform', `translate(${rearRightX} ${rearY})`);
+  const connectorEndY = 772;
+  el.rearConnectorLeft.setAttribute('d', `M${rearLeftX} ${rearY + 22}Q${rearLeftX - 16} ${Math.min(rearY + 46, connectorEndY - 14)} ${rearLeftX - 5} ${connectorEndY}`);
+  el.rearConnectorRight.setAttribute('d', `M${rearRightX} ${rearY + 22}Q${rearRightX + 16} ${Math.min(rearY + 46, connectorEndY - 14)} ${rearRightX + 5} ${connectorEndY}`);
+  el.reportedLabel.setAttribute('y', 810);
 
   const longitudinal = (bayLength - vehicle.length) / 2;
   const lateral = (bayWidth - vehicle.width) / 2;
@@ -242,17 +309,21 @@ function renderGeometry() {
   const bayBottom = cy + bayHeight / 2;
   const bayLeft = cx - bayPixelWidth / 2;
   const bayRight = cx + bayPixelWidth / 2;
-  const carTop = cy - carHeight / 2;
-  const carBottom = cy + carHeight / 2;
 
   Object.assign(el.clearances.front, { textContent: clearance(longitudinal) });
   Object.assign(el.clearances.rear, { textContent: clearance(longitudinal) });
   Object.assign(el.clearances.left, { textContent: clearance(lateral) });
   Object.assign(el.clearances.right, { textContent: clearance(lateral) });
-  el.clearances.front.setAttribute('x', cx); el.clearances.front.setAttribute('y', (bayTop + carTop) / 2 + 4);
-  el.clearances.rear.setAttribute('x', cx); el.clearances.rear.setAttribute('y', (bayBottom + carBottom) / 2 + 4);
-  el.clearances.left.setAttribute('x', (bayLeft + leftX) / 2); el.clearances.left.setAttribute('y', cy + 4);
-  el.clearances.right.setAttribute('x', (bayRight + rightX) / 2); el.clearances.right.setAttribute('y', cy + 4);
+  el.clearances.front.setAttribute('x', cx);
+  el.clearances.front.setAttribute('y', Math.max(70, Math.min(bayTop, carTop) - 16));
+  el.clearances.rear.setAttribute('x', cx);
+  el.clearances.rear.setAttribute('y', Math.min(742, Math.max(bayBottom, carBottom) + 18));
+  el.clearances.left.setAttribute('x', Math.max(28, Math.min(bayLeft, leftX) - 18));
+  el.clearances.left.setAttribute('y', cy + 4);
+  el.clearances.left.setAttribute('text-anchor', 'end');
+  el.clearances.right.setAttribute('x', Math.min(872, Math.max(bayRight, rightX) + 18));
+  el.clearances.right.setAttribute('y', cy + 4);
+  el.clearances.right.setAttribute('text-anchor', 'start');
   el.parkingBay.classList.toggle('is-overflow', longitudinal < 0 || lateral < 0);
   el.bayLengthOutput.textContent = mm(bayLength);
   el.bayWidthOutput.textContent = mm(bayWidth);
@@ -440,7 +511,7 @@ function initMotion() {
       const { isDesktop, reduceMotion } = context.conditions;
       if (reduceMotion) {
         motionEnabled = false;
-        gsap.set(['.hero-title-wrap', '.intro-block'], { clearProps: 'all' });
+        gsap.set('.hero-title-wrap', { clearProps: 'all' });
         return;
       }
 
@@ -475,13 +546,15 @@ function initMotion() {
           trigger: '.hero-story',
           start: 'top top',
           end: 'bottom bottom',
-          scrub: .4,
+          scrub: true,
+          invalidateOnRefresh: true,
           refreshPriority: -10
         }
       })
-        .to('.hero-title-wrap', { autoAlpha: 0, y: -distance, duration: .28, ease: 'none' }, .06)
-        .fromTo('.intro-block', { autoAlpha: 0, y: smallDistance }, { autoAlpha: 1, y: 0, duration: .22, ease: 'none' }, .36)
-        .to('.intro-block', { autoAlpha: 0, y: -smallDistance, duration: .14, ease: 'none' }, .62)
+        .to('.hero-title-wrap', { autoAlpha: 0, y: -distance, duration: .20, ease: 'none' }, .06)
+        .fromTo('.hero-chapter-links', { autoAlpha: 0 }, { autoAlpha: 1, duration: .08, ease: 'none' }, .25)
+        .fromTo('.hero-chapter-links a', { autoAlpha: 0, y: 34 }, { autoAlpha: 1, y: 0, duration: .18, stagger: .055, ease: 'none' }, .27)
+        .to('.hero-chapter-links', { autoAlpha: 0, y: -18, duration: .10, ease: 'none' }, .61)
         .to('.micro-nav', { autoAlpha: 0, y: -10, duration: .12, ease: 'none' }, .64);
 
       if (pixelTransition) {
