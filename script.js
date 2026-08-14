@@ -530,6 +530,7 @@ function initMotion() {
       motionEnabled = true;
       const distance = isDesktop ? 52 : 28;
       const smallDistance = isDesktop ? 28 : 16;
+      const chapterHold = 2;
       const pixelTransition = createHeroPixelTransition(!isDesktop);
       const pixelState = { progress: 0 };
       const historyHoverCleanups = [];
@@ -566,8 +567,8 @@ function initMotion() {
         .to('.hero-title-wrap', { autoAlpha: 0, y: -distance, duration: .20, ease: 'none' }, .06)
         .fromTo('.hero-chapter-links', { autoAlpha: 0 }, { autoAlpha: 1, duration: .08, ease: 'none' }, .25)
         .fromTo('.hero-chapter-links a', { autoAlpha: 0, y: 34 }, { autoAlpha: 1, y: 0, duration: .18, stagger: .055, ease: 'none' }, .27)
-        .to('.hero-chapter-links', { autoAlpha: 0, y: -18, duration: .10, ease: 'none' }, .61)
-        .to('.micro-nav', { autoAlpha: 0, y: -10, duration: .12, ease: 'none' }, .64);
+        .to('.hero-chapter-links', { autoAlpha: 0, y: -18, duration: .10, ease: 'none' }, .61 + chapterHold)
+        .to('.micro-nav', { autoAlpha: 0, y: -10, duration: .12, ease: 'none' }, .64 + chapterHold);
 
       if (pixelTransition) {
         heroTimeline
@@ -575,41 +576,41 @@ function initMotion() {
             pixelTransition.canvas,
             { autoAlpha: 0 },
             { autoAlpha: 1, duration: .08, ease: 'none' },
-            .66
+            .66 + chapterHold
           )
           .to(pixelState, {
             progress: 1,
             duration: .20,
             ease: 'none',
             onUpdate: () => pixelTransition.setProgress(pixelState.progress)
-          }, .66)
+          }, .66 + chapterHold)
           .to(pixelTransition.canvas, {
             autoAlpha: 0,
             duration: .10,
             ease: 'none'
-          }, .86)
+          }, .86 + chapterHold)
           .to('.hero-stage', {
             backgroundColor: '#f5f5f7',
             duration: .10,
             ease: 'none'
-          }, .86)
+          }, .86 + chapterHold)
           .fromTo(
             '.hero-history-reveal',
             { autoAlpha: 0 },
             { autoAlpha: 1, duration: .08, ease: 'none' },
-            .88
+            .88 + chapterHold
           )
           .fromTo(
             '#history-title',
             { autoAlpha: 0, y: distance },
             { autoAlpha: 1, y: 0, duration: .14, ease: 'none' },
-            .88
+            .88 + chapterHold
           )
           .fromTo(
             '.hero-history-reveal .section-note',
             { autoAlpha: 0, y: smallDistance },
             { autoAlpha: 1, y: 0, duration: .12, ease: 'none' },
-            .91
+            .91 + chapterHold
           );
       }
 
