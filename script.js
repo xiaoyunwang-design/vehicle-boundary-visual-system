@@ -175,7 +175,7 @@ function createLink(label, url) {
   link.href = url;
   link.target = '_blank';
   link.rel = 'noreferrer';
-  link.textContent = `${label} ↗`;
+  link.textContent = label;
   return link;
 }
 
