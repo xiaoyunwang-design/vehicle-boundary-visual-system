@@ -133,6 +133,7 @@ const el = {
   tabs: [...document.querySelectorAll('.vehicle-tab')],
   layerTabs: [...document.querySelectorAll('.layer-tab')],
   stage: document.querySelector('#mapStage'),
+  map: document.querySelector('#boundaryMap'),
   car: document.querySelector('#vehicleGraphic'),
   vehicleImage: document.querySelector('#vehicleImage'),
   visibleGraphic: document.querySelector('#visibleBoundaryGraphic'),
@@ -329,6 +330,17 @@ function renderGeometry() {
   el.bayWidthOutput.textContent = mm(bayWidth);
 }
 
+function updateMapViewport() {
+  const width = window.innerWidth;
+  if (width <= 599) {
+    el.map.setAttribute('viewBox', '150 0 600 820');
+  } else if (width <= 1099) {
+    el.map.setAttribute('viewBox', '90 0 720 820');
+  } else {
+    el.map.setAttribute('viewBox', '0 0 900 820');
+  }
+}
+
 function selectVehicle(key) {
   selectedVehicle = key;
   el.tabs.forEach((button) => {
@@ -503,8 +515,8 @@ function initMotion() {
   const media = gsap.matchMedia();
   media.add(
     {
-      isDesktop: '(min-width: 900px)',
-      isCompact: '(max-width: 899px)',
+      isDesktop: '(min-width: 1100px)',
+      isCompact: '(max-width: 1099px)',
       reduceMotion: '(prefers-reduced-motion: reduce)'
     },
     (context) => {
@@ -790,4 +802,6 @@ function initMotion() {
 
 updateVehicle();
 updateLayer('physical');
+updateMapViewport();
+window.addEventListener('resize', updateMapViewport, { passive: true });
 initMotion();

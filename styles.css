@@ -154,13 +154,16 @@ img { display: block; max-width: 100%; }
 }
 
 .micro-nav a {
+  display: flex;
+  min-height: 44px;
+  align-items: flex-start;
   color: var(--off-white);
   text-decoration: none;
   opacity: 1;
 }
 .micro-nav a:nth-child(1) { grid-column: 1 / 4; }
 .micro-nav a:nth-child(2) { grid-column: 8 / 10; }
-.micro-nav a:nth-child(3) { grid-column: 10 / 13; text-align: right; }
+.micro-nav a:nth-child(3) { grid-column: 10 / 13; justify-content: flex-end; text-align: right; }
 .micro-nav a:hover, .micro-nav a:focus-visible { opacity: .65; }
 
 .hero-story {
@@ -545,6 +548,9 @@ img { display: block; max-width: 100%; }
 
 .source-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
 .source-links a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
   padding: 8px 10px;
   border: 1px solid var(--dark-line);
   color: var(--off-white);
@@ -792,7 +798,7 @@ img { display: block; max-width: 100%; }
 .project-colophon a:hover, .project-colophon a:focus-visible { color: #fff; }
 
 /* Figma 827:752 — desktop boundary-lab composition */
-@media (min-width: 900px) {
+@media (min-width: 1100px) {
   .boundary-lab {
     position: relative;
     min-height: calc(300px + 100svh + 220px);
@@ -984,6 +990,23 @@ img { display: block; max-width: 100%; }
   .history-card-d { margin-top: 100px; }
 }
 
+/* Tablet portrait keeps the horizontal filters but uses the stacked lab layout. */
+@media (min-width: 600px) and (max-width: 1099px) {
+  .history-heading .history-title {
+    font-size: clamp(112px, 14.5vw, 148px);
+    line-height: .875;
+  }
+
+  .explore-intro.dark-section {
+    height: 720px;
+    min-height: 720px;
+  }
+
+  .map-stage {
+    aspect-ratio: 720 / 820;
+  }
+}
+
 @media (max-width: 899px) {
   :root { --page-margin: 24px; --gutter: 12px; --columns: 12; }
   .page-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
@@ -1052,7 +1075,7 @@ img { display: block; max-width: 100%; }
   .history-card-a, .history-card-b, .history-card-c, .history-card-d { grid-column: 1 / 13; margin: 0; width: 82%; }
   .history-card-b, .history-card-d { justify-self: end; }
   .history-card img { aspect-ratio: 1.45 / 1; }
-  .explore-intro { min-height: 800px; }
+  .explore-intro { height: 600px; min-height: 600px; }
   .vehicle-tabs-wrap { padding-inline: var(--page-margin); scroll-snap-type: x mandatory; }
   .vehicle-tabs { display: flex; min-width: max-content; gap: 14px; }
   .vehicle-tab { width: 230px; flex: 0 0 230px; scroll-snap-align: start; }
@@ -1063,7 +1086,7 @@ img { display: block; max-width: 100%; }
   .layer-controls { grid-template-columns: 1fr; }
   .layer-tab { min-height: 76px; }
   .visual-grid { padding-inline: 0; }
-  .map-stage { border-left: 0; border-right: 0; }
+  .map-stage { aspect-ratio: 600 / 820; border-left: 0; border-right: 0; }
   .parking-controls { grid-template-columns: 1fr; padding-inline: var(--page-margin); }
   .information-panel { padding-inline: var(--page-margin); }
   .information-panel dl { grid-template-columns: 1fr; }
@@ -1090,7 +1113,7 @@ img { display: block; max-width: 100%; }
 }
 
 /* Keep the desktop filter language on iPad and mobile. */
-@media (max-width: 899px) {
+@media (max-width: 1099px) {
   .vehicle-tabs-wrap {
     scroll-snap-type: x mandatory;
   }
