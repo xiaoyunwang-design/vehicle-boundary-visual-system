@@ -401,111 +401,6 @@ function animateLayerSelection(layer) {
   );
 }
 
-function createHeroPixelTransition(isCompact) {
-  const canvas = document.querySelector('#heroPixelTransition');
-  if (!canvas) return null;
-
-  const context = canvas.getContext('2d', { alpha: false });
-  const sampleCanvas = document.createElement('canvas');
-  const sampleContext = sampleCanvas.getContext('2d', { alpha: false });
-  const image = new Image();
-  let ready = false;
-  let progress = 0;
-  let frame = 0;
-
-  const resize = () => {
-    const pixelRatio = isCompact ? 1 : Math.min(window.devicePixelRatio || 1, 1.25);
-    canvas.width = Math.max(1, Math.round(canvas.clientWidth * pixelRatio));
-    canvas.height = Math.max(1, Math.round(canvas.clientHeight * pixelRatio));
-  };
-
-  const drawImageCover = (targetContext, targetWidth, targetHeight) => {
-    const imageRatio = image.naturalWidth / image.naturalHeight;
-    const targetRatio = targetWidth / targetHeight;
-    let sourceWidth = image.naturalWidth;
-    let sourceHeight = image.naturalHeight;
-    let sourceX = 0;
-    let sourceY = 0;
-
-    if (imageRatio > targetRatio) {
-      sourceWidth = image.naturalHeight * targetRatio;
-      sourceX = (image.naturalWidth - sourceWidth) / 2;
-    } else {
-      sourceHeight = image.naturalWidth / targetRatio;
-      sourceY = (image.naturalHeight - sourceHeight) / 2;
-    }
-
-    targetContext.drawImage(
-      image,
-      sourceX,
-      sourceY,
-      sourceWidth,
-      sourceHeight,
-      0,
-      0,
-      targetWidth,
-      targetHeight
-    );
-  };
-
-  const render = () => {
-    frame = 0;
-    if (!ready || !canvas.width || !canvas.height) return;
-
-    const maximumPixel = isCompact ? 38 : 58;
-    const pixelSize = Math.max(1, Math.round(1 + maximumPixel * Math.pow(1 - progress, 1.65)));
-    const sampleWidth = Math.max(1, Math.ceil(canvas.width / pixelSize));
-    const sampleHeight = Math.max(1, Math.ceil(canvas.height / pixelSize));
-    if (sampleCanvas.width !== sampleWidth) sampleCanvas.width = sampleWidth;
-    if (sampleCanvas.height !== sampleHeight) sampleCanvas.height = sampleHeight;
-
-    sampleContext.imageSmoothingEnabled = true;
-    sampleContext.fillStyle = '#000';
-    sampleContext.fillRect(0, 0, sampleWidth, sampleHeight);
-    drawImageCover(sampleContext, sampleWidth, sampleHeight);
-
-    context.imageSmoothingEnabled = false;
-    context.fillStyle = '#000';
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.drawImage(sampleCanvas, 0, 0, canvas.width, canvas.height);
-  };
-
-  const requestRender = () => {
-    if (!frame) frame = requestAnimationFrame(render);
-  };
-
-  const setProgress = (value) => {
-    progress = Math.max(0, Math.min(1, value));
-    requestRender();
-  };
-
-  const handleResize = () => {
-    resize();
-    requestRender();
-  };
-
-  image.addEventListener('load', () => {
-    ready = true;
-    resize();
-    requestRender();
-  }, { once: true });
-  image.addEventListener('error', () => {
-    canvas.style.display = 'none';
-  }, { once: true });
-  image.src = 'assets/images/disappearing-bumper-transition-vector.svg';
-  window.addEventListener('resize', handleResize, { passive: true });
-
-  return {
-    canvas,
-    setProgress,
-    destroy() {
-      if (frame) cancelAnimationFrame(frame);
-      window.removeEventListener('resize', handleResize);
-      context.clearRect(0, 0, canvas.width, canvas.height);
-    }
-  };
-}
-
 function initMotion() {
   if (!window.gsap || !window.ScrollTrigger) return;
 
@@ -530,11 +425,8 @@ function initMotion() {
       motionEnabled = true;
       const distance = isDesktop ? 52 : 28;
       const smallDistance = isDesktop ? 28 : 16;
-      const chapterHold = 2;
-      const pixelTransition = createHeroPixelTransition(!isDesktop);
-      const pixelState = { progress: 0 };
+      const chapterHold = 1.25;
       const historyHoverCleanups = [];
-      let heroReturningFromBelow = false;
 
       const restoreHeroStart = () => {
         gsap.set('.hero-stage', { backgroundColor: '#000' });
@@ -546,14 +438,7 @@ function initMotion() {
         gsap.set('#history-title', { autoAlpha: 0, y: distance });
         gsap.set('.hero-history-reveal .section-note', { autoAlpha: 0, y: smallDistance });
 
-        pixelState.progress = 0;
-        if (pixelTransition) {
-          pixelTransition.setProgress(0);
-          gsap.set(pixelTransition.canvas, { autoAlpha: 0 });
-        }
       };
-
-      if (pixelTransition) gsap.set(pixelTransition.canvas, { autoAlpha: 0 });
 
       gsap.from('.micro-nav a', {
         autoAlpha: 0,
@@ -581,23 +466,8 @@ function initMotion() {
           scrub: true,
           invalidateOnRefresh: true,
           refreshPriority: -10,
-          onEnterBack: () => {
-            heroReturningFromBelow = true;
-            restoreHeroStart();
-          },
-          onLeave: () => {
-            heroReturningFromBelow = false;
-          },
           onUpdate: (self) => {
-            if (self.direction > 0) heroReturningFromBelow = false;
-
-            if (heroReturningFromBelow && self.direction < 0) {
-              restoreHeroStart();
-              return;
-            }
-
             if (self.progress <= .015) {
-              heroReturningFromBelow = false;
               restoreHeroStart();
             }
           },
@@ -610,51 +480,30 @@ function initMotion() {
         .fromTo('.hero-chapter-links', { autoAlpha: 0 }, { autoAlpha: 1, duration: .08, ease: 'none' }, .25)
         .fromTo('.hero-chapter-links a', { autoAlpha: 0, y: 34 }, { autoAlpha: 1, y: 0, duration: .18, stagger: .055, ease: 'none' }, .27)
         .to('.hero-chapter-links', { autoAlpha: 0, y: -18, duration: .10, ease: 'none' }, .61 + chapterHold)
-        .to('.micro-nav', { autoAlpha: 0, y: -10, duration: .12, ease: 'none' }, .64 + chapterHold);
-
-      if (pixelTransition) {
-        heroTimeline
-          .fromTo(
-            pixelTransition.canvas,
-            { autoAlpha: 0 },
-            { autoAlpha: 1, duration: .08, ease: 'none' },
-            .66 + chapterHold
-          )
-          .to(pixelState, {
-            progress: 1,
-            duration: .20,
-            ease: 'none',
-            onUpdate: () => pixelTransition.setProgress(pixelState.progress)
-          }, .66 + chapterHold)
-          .to(pixelTransition.canvas, {
-            autoAlpha: 0,
-            duration: .10,
-            ease: 'none'
-          }, .86 + chapterHold)
-          .to('.hero-stage', {
+        .to('.micro-nav', { autoAlpha: 0, y: -10, duration: .12, ease: 'none' }, .64 + chapterHold)
+        .to('.hero-stage', {
             backgroundColor: '#f5f5f7',
             duration: .10,
             ease: 'none'
-          }, .86 + chapterHold)
-          .fromTo(
+          }, .70 + chapterHold)
+        .fromTo(
             '.hero-history-reveal',
             { autoAlpha: 0 },
             { autoAlpha: 1, duration: .08, ease: 'none' },
-            .88 + chapterHold
+            .72 + chapterHold
           )
-          .fromTo(
+        .fromTo(
             '#history-title',
             { autoAlpha: 0, y: distance },
             { autoAlpha: 1, y: 0, duration: .14, ease: 'none' },
-            .88 + chapterHold
+            .72 + chapterHold
           )
-          .fromTo(
+        .fromTo(
             '.hero-history-reveal .section-note',
             { autoAlpha: 0, y: smallDistance },
             { autoAlpha: 1, y: 0, duration: .12, ease: 'none' },
-            .91 + chapterHold
+            .75 + chapterHold
           );
-      }
 
       const headingReveals = [
         ['#explore-title', '.explore-intro', distance],
@@ -832,8 +681,6 @@ function initMotion() {
       return () => {
         motionEnabled = false;
         historyHoverCleanups.forEach((cleanup) => cleanup());
-        pixelTransition?.destroy();
-        if (pixelTransition) gsap.set(pixelTransition.canvas, { clearProps: 'all' });
       };
     }
   );
