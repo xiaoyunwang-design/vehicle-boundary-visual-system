@@ -534,6 +534,24 @@ function initMotion() {
       const pixelTransition = createHeroPixelTransition(!isDesktop);
       const pixelState = { progress: 0 };
       const historyHoverCleanups = [];
+      let heroReturningFromBelow = false;
+
+      const restoreHeroStart = () => {
+        gsap.set('.hero-stage', { backgroundColor: '#000' });
+        gsap.set('.hero-title-wrap', { autoAlpha: 1, y: 0 });
+        gsap.set('.hero-chapter-links', { autoAlpha: 0, y: 0 });
+        gsap.set('.hero-chapter-links a', { autoAlpha: 0, y: 34 });
+        gsap.set('.micro-nav', { autoAlpha: 1, y: 0 });
+        gsap.set('.hero-history-reveal', { autoAlpha: 0 });
+        gsap.set('#history-title', { autoAlpha: 0, y: distance });
+        gsap.set('.hero-history-reveal .section-note', { autoAlpha: 0, y: smallDistance });
+
+        pixelState.progress = 0;
+        if (pixelTransition) {
+          pixelTransition.setProgress(0);
+          gsap.set(pixelTransition.canvas, { autoAlpha: 0 });
+        }
+      };
 
       if (pixelTransition) gsap.set(pixelTransition.canvas, { autoAlpha: 0 });
 
@@ -556,12 +574,36 @@ function initMotion() {
 
       const heroTimeline = gsap.timeline({
         scrollTrigger: {
+          id: 'hero-story',
           trigger: '.hero-story',
           start: 'top top',
           end: 'bottom bottom',
           scrub: true,
           invalidateOnRefresh: true,
-          refreshPriority: -10
+          refreshPriority: -10,
+          onEnterBack: () => {
+            heroReturningFromBelow = true;
+            restoreHeroStart();
+          },
+          onLeave: () => {
+            heroReturningFromBelow = false;
+          },
+          onUpdate: (self) => {
+            if (self.direction > 0) heroReturningFromBelow = false;
+
+            if (heroReturningFromBelow && self.direction < 0) {
+              restoreHeroStart();
+              return;
+            }
+
+            if (self.progress <= .015) {
+              heroReturningFromBelow = false;
+              restoreHeroStart();
+            }
+          },
+          onRefresh: (self) => {
+            if (self.progress <= .015) restoreHeroStart();
+          }
         }
       })
         .to('.hero-title-wrap', { autoAlpha: 0, y: -distance, duration: .20, ease: 'none' }, .06)
