@@ -452,6 +452,7 @@ img { display: block; max-width: 100%; }
 .vehicle-tabs-wrap {
   overflow-x: auto;
   padding-inline: var(--page-margin);
+  scroll-padding-inline: var(--page-margin);
   scrollbar-width: none;
 }
 
@@ -807,7 +808,14 @@ img { display: block; max-width: 100%; }
   }
 
   .vehicle-tabs {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    width: 100%;
+    min-width: 0;
     min-height: 160px;
+  }
+
+  .vehicle-tab > .display {
+    font-size: clamp(32px, 2.65vw, 40px);
   }
 
   .vehicle-tabs::after {
@@ -1157,6 +1165,7 @@ img { display: block; max-width: 100%; }
     gap: var(--gutter);
     overflow-x: auto;
     border: 0;
+    scroll-padding-inline: var(--page-margin);
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
   }
@@ -1196,5 +1205,64 @@ img { display: block; max-width: 100%; }
   .layer-tab.is-active {
     background: transparent;
     box-shadow: none;
+  }
+}
+
+/* iPad: keep both selector rows inside the responsive page margins. */
+@media (min-width: 768px) and (max-width: 1099px) {
+  .vehicle-tabs-wrap {
+    overflow-x: visible;
+    scroll-snap-type: none;
+  }
+
+  .vehicle-tabs {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    width: 100%;
+    min-width: 0;
+    gap: var(--gutter);
+  }
+
+  .vehicle-tab {
+    width: auto;
+    min-width: 0;
+    flex: none;
+  }
+
+  .vehicle-tab > .display {
+    overflow: visible;
+    font-size: clamp(23px, 3vw, 32px);
+    line-height: .95;
+    white-space: normal;
+  }
+
+  .vehicle-tab > small {
+    display: block;
+    margin-top: 8px;
+    font-size: clamp(11px, 1.55vw, 14px);
+    line-height: 1.25;
+  }
+
+  .layer-controls {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    width: 100%;
+    margin: 0 0 46px;
+    padding-inline: 0;
+    gap: var(--gutter);
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .layer-tab {
+    width: auto;
+    min-width: 0;
+    flex: none;
+  }
+
+  .layer-tab > span {
+    font-size: clamp(14px, 1.9vw, 18px);
+    line-height: 1.2;
+    overflow-wrap: normal;
   }
 }
