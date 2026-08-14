@@ -1266,3 +1266,25 @@ img { display: block; max-width: 100%; }
     overflow-wrap: normal;
   }
 }
+
+/* Mobile: keep both selector rows as native, touch-scrollable carousels. */
+@media (max-width: 599px) {
+  .vehicle-tabs-wrap,
+  .layer-controls {
+    max-width: 100vw;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x pan-y;
+  }
+
+  .vehicle-tabs {
+    width: max-content;
+    min-width: max-content;
+  }
+
+  .layer-controls {
+    min-width: 0;
+  }
+}
