@@ -425,7 +425,6 @@ function initMotion() {
       motionEnabled = true;
       const distance = isDesktop ? 52 : 28;
       const smallDistance = isDesktop ? 28 : 16;
-      const chapterHold = 1.25;
       const historyHoverCleanups = [];
 
       const restoreHeroStart = () => {
@@ -434,10 +433,6 @@ function initMotion() {
         gsap.set('.hero-chapter-links', { autoAlpha: 0, y: 0 });
         gsap.set('.hero-chapter-links a', { autoAlpha: 0, y: 34 });
         gsap.set('.micro-nav', { autoAlpha: 1, y: 0 });
-        gsap.set('.hero-history-reveal', { autoAlpha: 0 });
-        gsap.set('#history-title', { autoAlpha: 0, y: distance });
-        gsap.set('.hero-history-reveal .section-note', { autoAlpha: 0, y: smallDistance });
-
       };
 
       gsap.from('.micro-nav a', {
@@ -478,34 +473,10 @@ function initMotion() {
       })
         .to('.hero-title-wrap', { autoAlpha: 0, y: -distance, duration: .20, ease: 'none' }, .06)
         .fromTo('.hero-chapter-links', { autoAlpha: 0 }, { autoAlpha: 1, duration: .08, ease: 'none' }, .25)
-        .fromTo('.hero-chapter-links a', { autoAlpha: 0, y: 34 }, { autoAlpha: 1, y: 0, duration: .18, stagger: .055, ease: 'none' }, .27)
-        .to('.hero-chapter-links', { autoAlpha: 0, y: -18, duration: .10, ease: 'none' }, .61 + chapterHold)
-        .to('.micro-nav', { autoAlpha: 0, y: -10, duration: .12, ease: 'none' }, .64 + chapterHold)
-        .to('.hero-stage', {
-            backgroundColor: '#f5f5f7',
-            duration: .10,
-            ease: 'none'
-          }, .70 + chapterHold)
-        .fromTo(
-            '.hero-history-reveal',
-            { autoAlpha: 0 },
-            { autoAlpha: 1, duration: .08, ease: 'none' },
-            .72 + chapterHold
-          )
-        .fromTo(
-            '#history-title',
-            { autoAlpha: 0, y: distance },
-            { autoAlpha: 1, y: 0, duration: .14, ease: 'none' },
-            .72 + chapterHold
-          )
-        .fromTo(
-            '.hero-history-reveal .section-note',
-            { autoAlpha: 0, y: smallDistance },
-            { autoAlpha: 1, y: 0, duration: .12, ease: 'none' },
-            .75 + chapterHold
-          );
+        .fromTo('.hero-chapter-links a', { autoAlpha: 0, y: 34 }, { autoAlpha: 1, y: 0, duration: .18, stagger: .055, ease: 'none' }, .27);
 
       const headingReveals = [
+        ['#history-title', '.history-heading', distance],
         ['#explore-title', '.explore-intro', distance],
         ['#about-title', '.about', distance],
         ['#references-title', '.reference-section', distance]
@@ -530,7 +501,7 @@ function initMotion() {
         );
       });
 
-      gsap.utils.toArray('.section-note').filter((note) => !note.closest('.hero-history-reveal')).forEach((note) => {
+      gsap.utils.toArray('.section-note').forEach((note) => {
         gsap.fromTo(
           note,
           { autoAlpha: 0, y: smallDistance },
