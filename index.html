@@ -6,7 +6,9 @@
   <meta name="description" content="A research-led visual system exploring how EV drivers understand vehicle boundaries, parking space and unavailable visibility data.">
   <title>Vehicle Boundary Visual System — V2</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="styles.css?v=35">
+  <link rel="preload" href="assets/fonts/BebasNeue-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/NeueHaasUnica-Medium.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css?v=53">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -17,7 +19,7 @@
         <nav class="micro-nav page-grid" aria-label="Project navigation">
           <a href="#question">Vehicle Visual Boundary System</a>
           <a href="#explore">Explore EVs</a>
-          <a href="#about">About + Sources</a>
+          <a href="#about">About</a>
         </nav>
         <div class="hero-title-wrap page-grid">
           <h1 class="display display-xl" id="hero-title">
@@ -26,9 +28,9 @@
           </h1>
         </div>
         <nav class="hero-chapter-links page-grid" aria-label="Jump to a project chapter">
-          <a href="#history"><span>Disappearing</span><b>Bumper</b></a>
-          <a href="#explore"><span>Explore</span><b>One Vehicle</b></a>
-          <a href="#about"><span>Project</span><b>Background</b></a>
+          <a href="#history"><span class="hero-chapter-copy"><span>Disappearing</span><b>Bumper</b></span></a>
+          <a href="#explore"><span class="hero-chapter-copy"><span>Explore</span><b>One Vehicle</b></span></a>
+          <a href="#about"><span class="hero-chapter-copy"><span>Project</span><b>Background</b></span></a>
         </nav>
       </div>
     </section>
@@ -82,24 +84,28 @@
     <section class="boundary-lab dark-section" id="boundaryLab" aria-labelledby="boundary-heading">
       <h2 class="visually-hidden" id="boundary-heading">Interactive vehicle boundary visual</h2>
 
-      <div class="vehicle-tabs-wrap">
-        <div class="vehicle-tabs" role="tablist" aria-label="Choose an electric vehicle">
-          <button class="vehicle-tab is-active" type="button" role="tab" aria-selected="true" data-vehicle="sakura">
-            <span class="display">Nissan Sakura</span><small>Japan · City EV</small>
-          </button>
-          <button class="vehicle-tab" type="button" role="tab" aria-selected="false" data-vehicle="ioniq6">
-            <span class="display">Hyundai IONIQ 6</span><small>South Korea · Saloon</small>
-          </button>
-          <button class="vehicle-tab" type="button" role="tab" aria-selected="false" data-vehicle="ev3">
-            <span class="display">Kia EV3 Air</span><small>South Korea · Compact SUV</small>
-          </button>
-          <button class="vehicle-tab" type="button" role="tab" aria-selected="false" data-vehicle="vf9">
-            <span class="display">VinFast VF 9</span><small>Vietnam · Large SUV</small>
-          </button>
-          <button class="vehicle-tab" type="button" role="tab" aria-selected="false" data-vehicle="x9">
-            <span class="display">XPeng X9</span><small>China · Electric MPV</small>
-          </button>
+      <div class="vehicle-selector">
+        <button class="vehicle-nav-button vehicle-nav-previous" type="button" aria-label="Previous vehicle">&lt;</button>
+        <div class="vehicle-tabs-wrap">
+          <div class="vehicle-tabs" role="tablist" aria-label="Choose an electric vehicle">
+            <button class="vehicle-tab is-active" type="button" role="tab" aria-selected="true" data-vehicle="sakura">
+              <span class="display">Nissan Sakura</span><small>Japan · City EV</small>
+            </button>
+            <button class="vehicle-tab" type="button" role="tab" aria-selected="false" data-vehicle="ioniq6">
+              <span class="display">Hyundai IONIQ 6</span><small>South Korea · Saloon</small>
+            </button>
+            <button class="vehicle-tab" type="button" role="tab" aria-selected="false" data-vehicle="ev3">
+              <span class="display">Kia EV3 Air</span><small>South Korea · Compact SUV</small>
+            </button>
+            <button class="vehicle-tab" type="button" role="tab" aria-selected="false" data-vehicle="vf9">
+              <span class="display">VinFast VF 9</span><small>Vietnam · Large SUV</small>
+            </button>
+            <button class="vehicle-tab" type="button" role="tab" aria-selected="false" data-vehicle="x9">
+              <span class="display">XPeng X9</span><small>China · Electric MPV</small>
+            </button>
+          </div>
         </div>
+        <button class="vehicle-nav-button vehicle-nav-next" type="button" aria-label="Next vehicle">&gt;</button>
       </div>
 
       <div class="lab-grid page-grid">
@@ -193,7 +199,7 @@
     <section class="about light-section" id="about" aria-labelledby="about-title">
       <div class="page-grid about-grid">
         <div class="about-heading grid-col-2">
-          <h2 class="display" id="about-title">About the<br>project</h2>
+          <h2 class="display" id="about-title">About the<br><span>project</span></h2>
         </div>
         <div class="about-copy grid-col-2">
           <p class="eyebrow">Research question</p>
@@ -208,7 +214,7 @@
       <div class="page-grid reference-grid">
         <h2 class="display" id="references-title">Reference</h2>
 
-        <ol class="reference-list">
+        <ol class="reference-list" id="reference-list">
           <li><span class="reference-type">Vehicle outline</span><p>3D CAD Browser (no date) <i>Hyundai IONIQ 6 3D model</i>. Available at: <a href="https://www.3dcadbrowser.com/3d-model/hyundai-ioniq-6" target="_blank" rel="noreferrer">https://www.3dcadbrowser.com/3d-model/hyundai-ioniq-6</a> (Accessed: 6 August 2026).</p></li>
           <li><span class="reference-type">Vehicle outline</span><p>3DModels.org (no date a) <i>Kia EV3 with HQ interior 2025 3D model</i>. Available at: <a href="https://3dmodels.org/3d-models/kia-ev3-with-hq-interior-2024/" target="_blank" rel="noreferrer">https://3dmodels.org/3d-models/kia-ev3-with-hq-interior-2024/</a> (Accessed: 6 August 2026).</p></li>
           <li><span class="reference-type">Vehicle outline</span><p>3DModels.org (no date b) <i>Nissan Sakura 2025 3D model</i>. Available at: <a href="https://3dmodels.org/3d-models/nissan-sakura-2023/" target="_blank" rel="noreferrer">https://3dmodels.org/3d-models/nissan-sakura-2023/</a> (Accessed: 6 August 2026).</p></li>
@@ -234,6 +240,11 @@
           <li><span class="reference-type">Vehicle outline</span><p>XPeng Malaysia (no date) <i>XPENG X9</i>. Available at: <a href="https://www.xpeng.com.my/x9.php" target="_blank" rel="noreferrer">https://www.xpeng.com.my/x9.php</a> (Accessed: 6 August 2026).</p></li>
         </ol>
 
+        <button class="reference-toggle" id="referenceToggle" type="button" aria-expanded="false" aria-controls="reference-list" hidden>
+          <span class="reference-toggle-label">Show all references</span>
+          <span class="reference-toggle-symbol" aria-hidden="true">+</span>
+        </button>
+
         <footer class="project-colophon" aria-label="Project information">
           <div>
             <span>Date</span>
@@ -255,6 +266,6 @@
 
   <script src="assets/vendor/gsap.min.js"></script>
   <script src="assets/vendor/ScrollTrigger.min.js"></script>
-  <script src="script.js?v=31"></script>
+  <script src="script.js?v=36"></script>
 </body>
 </html>

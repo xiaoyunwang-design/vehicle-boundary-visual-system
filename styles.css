@@ -1,6 +1,7 @@
 @font-face {
   font-family: "Bebas Neue";
-  src: url("assets/fonts/BebasNeue-Regular.ttf") format("truetype");
+  src: url("assets/fonts/BebasNeue-Regular.woff2") format("woff2"),
+       url("assets/fonts/BebasNeue-Regular.ttf") format("truetype");
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -8,7 +9,8 @@
 
 @font-face {
   font-family: "Neue Haas Unica";
-  src: url("assets/fonts/NeueHaasUnica-Regular.ttf") format("truetype");
+  src: url("assets/fonts/NeueHaasUnica-Regular.woff2") format("woff2"),
+       url("assets/fonts/NeueHaasUnica-Regular.ttf") format("truetype");
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -16,7 +18,8 @@
 
 @font-face {
   font-family: "Neue Haas Unica";
-  src: url("assets/fonts/NeueHaasUnica-Medium.ttf") format("truetype");
+  src: url("assets/fonts/NeueHaasUnica-Medium.woff2") format("woff2"),
+       url("assets/fonts/NeueHaasUnica-Medium.ttf") format("truetype");
   font-style: normal;
   font-weight: 500;
   font-display: swap;
@@ -24,7 +27,8 @@
 
 @font-face {
   font-family: "Neue Haas Unica";
-  src: url("assets/fonts/NeueHaasUnica-Bold.ttf") format("truetype");
+  src: url("assets/fonts/NeueHaasUnica-Bold.woff2") format("woff2"),
+       url("assets/fonts/NeueHaasUnica-Bold.ttf") format("truetype");
   font-style: normal;
   font-weight: 700;
   font-display: swap;
@@ -48,8 +52,8 @@
   --gutter: 20px;
   --columns: 12;
   --column: calc((100vw - (var(--page-margin) * 2) - (var(--gutter) * 11)) / 12);
-  --font-display: "Bebas Neue";
-  --font-body: "Neue Haas Unica";
+  --font-display: "Bebas Neue", "Arial Narrow", Arial, sans-serif;
+  --font-body: "Neue Haas Unica", Arial, Helvetica, sans-serif;
   --type-h1: clamp(96px, 10.582vw, 160px);
   --type-h2: clamp(72px, 6.614vw, 100px);
   --type-h3: clamp(40px, 3.307vw, 50px);
@@ -214,8 +218,8 @@ img { display: block; max-width: 100%; }
 
 .hero-chapter-links a {
   min-height: calc(190px + clamp(82px, 13svh, 118px));
-  padding: 0 0 28px 14px;
-  border-left: 1px solid var(--charcoal);
+  padding: 0 0 28px;
+  border: 0;
   color: var(--off-white);
   font-family: var(--font-display);
   font-size: clamp(34px, 3.3vw, 50px);
@@ -229,6 +233,10 @@ img { display: block; max-width: 100%; }
 .hero-chapter-links a:nth-child(1) { grid-column: 1 / 5; }
 .hero-chapter-links a:nth-child(2) { grid-column: 5 / 9; }
 .hero-chapter-links a:nth-child(3) { grid-column: 9 / 13; }
+.hero-chapter-copy {
+  padding-left: 14px;
+  border-left: 1px solid var(--charcoal);
+}
 .hero-chapter-links span,
 .hero-chapter-links b { display: block; font-weight: 400; transition: color .2s ease; }
 .hero-chapter-links b { color: var(--charcoal); }
@@ -423,6 +431,8 @@ img { display: block; max-width: 100%; }
 }
 
 .vehicle-tabs-wrap::-webkit-scrollbar { display: none; }
+
+.vehicle-nav-button { display: none; }
 
 .vehicle-tabs {
   position: relative;
@@ -677,6 +687,7 @@ img { display: block; max-width: 100%; }
 .about-grid { min-height: inherit; position: relative; align-items: start; padding-block: 90px 140px; }
 .about-heading { grid-column: 1 / 7; }
 .about-heading h2 { font-size: var(--type-h2); line-height: .9; }
+.about-heading h2 span { color: var(--charcoal); }
 .about-copy { grid-column: 7 / 13; padding-top: 4px; }
 .about-copy .eyebrow {
   margin-bottom: 24px;
@@ -718,7 +729,7 @@ img { display: block; max-width: 100%; }
   font-weight: 400;
   line-height: 16px;
 }
-.reference-list li:last-child { border-bottom: 1px solid var(--dark-line); }
+.reference-list li:last-child { border-bottom: 0; }
 .reference-list li::before {
   content: counter(references, decimal-leading-zero);
   grid-column: 1 / 2;
@@ -729,8 +740,36 @@ img { display: block; max-width: 100%; }
 .reference-type { grid-column: 2 / 3; color: var(--charcoal); font-size: 10px; font-weight: 500; text-transform: none; letter-spacing: 0; }
 .reference-list p { grid-column: 3 / 7; margin: 0; overflow-wrap: anywhere; }
 .reference-list i { color: var(--off-white); }
-.reference-list a { color: inherit; text-underline-offset: 3px; }
+.reference-list a { color: inherit; text-decoration: none; }
 .reference-list a:hover, .reference-list a:focus-visible { color: var(--off-white); }
+
+.reference-list.is-collapsed li:nth-child(n + 5) { display: none; }
+
+.reference-toggle {
+  grid-column: 7 / 13;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 18px 0;
+  border: 0;
+  border-top: 1px solid var(--dark-line);
+  border-bottom: 1px solid var(--dark-line);
+  background: transparent;
+  color: var(--off-white);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.reference-toggle[hidden] { display: none; }
+.reference-toggle:hover .reference-toggle-label,
+.reference-toggle:focus-visible .reference-toggle-label { text-decoration: underline; text-underline-offset: 4px; }
+.reference-toggle:focus-visible { outline: 1px solid var(--charcoal); outline-offset: 4px; }
+.reference-toggle-symbol { color: var(--charcoal); font-size: 18px; font-weight: 400; }
 
 .project-colophon {
   grid-column: 1 / 13;
@@ -766,18 +805,36 @@ img { display: block; max-width: 100%; }
 
 /* Figma 827:752 — desktop boundary-lab composition */
 @media (min-width: 1100px) {
+  .hero-chapter-links a {
+    padding-left: 14px;
+    border-left: 1px solid var(--charcoal);
+  }
+
+  .hero-chapter-copy {
+    padding-left: 0;
+    border-left: 0;
+  }
+
   .boundary-lab {
     position: relative;
-    min-height: calc(300px + 100svh + 220px);
+    min-height: calc(240px + 100svh + 220px);
     padding: 0;
     overflow: hidden;
+  }
+
+  .vehicle-tabs-wrap {
+    width: 100%;
+    max-width: 1680px;
+    margin-inline: auto;
+    padding-inline: var(--page-margin);
+    overflow-x: hidden;
   }
 
   .vehicle-tabs {
     grid-template-columns: repeat(5, minmax(0, 1fr));
     width: 100%;
     min-width: 0;
-    min-height: 160px;
+    min-height: 130px;
   }
 
   .vehicle-tab > .display {
@@ -785,11 +842,19 @@ img { display: block; max-width: 100%; }
   }
 
   .vehicle-tabs::after {
-    top: 170px;
+    top: 129px;
   }
 
   .vehicle-tab {
-    min-height: 160px;
+    min-height: 130px;
+    padding: 32px 0 14px;
+  }
+
+  .vehicle-tab > small {
+    display: block;
+    margin-top: 8px;
+    font-size: 14px;
+    line-height: 18px;
   }
 
   .vehicle-tab .vehicle-tab-meta {
@@ -805,18 +870,21 @@ img { display: block; max-width: 100%; }
   .layer-controls {
     position: absolute;
     z-index: 4;
-    top: 179px;
-    right: var(--page-margin);
-    left: var(--page-margin);
+    top: 145px;
+    right: auto;
+    left: 50%;
     display: grid;
+    width: min(calc(100% - (2 * var(--page-margin))), 1400px);
     grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: var(--gutter);
     border: 0;
+    transform: translateX(-50%);
   }
 
   .layer-tab {
+    position: relative;
     display: block;
-    min-height: 82px;
+    min-height: 70px;
     padding: 0;
     border: 0;
   }
@@ -826,6 +894,7 @@ img { display: block; max-width: 100%; }
   }
 
   .layer-tab > span {
+    display: block;
     font-size: 18px;
     font-weight: 700;
     line-height: 22px;
@@ -844,10 +913,24 @@ img { display: block; max-width: 100%; }
     box-shadow: none;
   }
 
+  .layer-tab.is-active > span {
+    position: relative;
+  }
+
+  .layer-tab.is-active > span::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -14px;
+    width: 1px;
+    background: var(--layer-color);
+  }
+
   .visual-grid {
     position: absolute;
     z-index: 2;
-    inset: 300px 0 0;
+    inset: 240px 0 0;
     display: block;
     padding: 0;
   }
@@ -1012,6 +1095,7 @@ img { display: block; max-width: 100%; }
   .about-copy { grid-column: 4 / 13; margin-top: 100px; }
   .reference-grid > h2 { grid-column: 1 / 9; }
   .reference-list { grid-column: 1 / 13; }
+  .reference-toggle { grid-column: 1 / 13; }
   .reference-list li { grid-template-columns: repeat(12, minmax(0, 1fr)); }
   .reference-type { grid-column: 2 / 5; }
   .reference-list p { grid-column: 5 / 13; }
@@ -1048,10 +1132,11 @@ img { display: block; max-width: 100%; }
   .hero-chapter-links a:nth-child(3) {
     grid-column: 1 / -1;
     min-height: 0;
-    padding: 12px 0 14px 12px;
+    padding: 12px 0 14px;
     font-size: clamp(28px, 8vw, 34px);
     line-height: .94;
   }
+  .hero-chapter-copy { padding-left: 12px; }
   .hero-intro-grid { height: 100%; min-height: 0; padding-bottom: 72px; }
   .intro-block { grid-column: 1 / 13; }
   .intro-block p { max-width: 310px; }
@@ -1087,7 +1172,7 @@ img { display: block; max-width: 100%; }
   .parking-controls { grid-template-columns: 1fr; padding-inline: var(--page-margin); }
   .information-panel { padding-inline: var(--page-margin); }
   .information-panel h3 {
-    color: var(--charcoal);
+    color: var(--off-white);
     font-size: 19px;
     line-height: 23px;
   }
@@ -1115,75 +1200,109 @@ img { display: block; max-width: 100%; }
   .hero-title-wrap, .intro-block { opacity: 1 !important; transform: none !important; }
 }
 
-/* Keep the desktop filter language on iPad and mobile. */
+/* Tablet and mobile boundary lab: one clear vehicle navigator, all layers visible. */
 @media (max-width: 1099px) {
-  .vehicle-tabs-wrap {
-    scroll-snap-type: x mandatory;
-  }
-
-  .vehicle-tabs {
-    display: flex;
-    min-width: max-content;
-    min-height: 160px;
-    gap: var(--gutter);
-  }
-
-  .vehicle-tab {
-    width: 222px;
-    min-height: 160px;
-    flex: 0 0 222px;
-    padding: 73px 0 0;
-    scroll-snap-align: start;
-  }
-
-  .vehicle-tab > .display {
-    font-size: 40px;
-    line-height: 36px;
-  }
-
-  .vehicle-tab .vehicle-tab-meta {
-    display: none;
-  }
-
-  .lab-grid {
+  .boundary-lab {
     display: flex;
     flex-direction: column;
-    padding-top: 24px;
+    padding-bottom: 110px;
   }
 
-  .layer-controls {
-    order: -1;
-    display: flex;
-    width: calc(100% + (var(--page-margin) * 2));
-    margin: 0 calc(var(--page-margin) * -1) 46px;
-    padding-inline: var(--page-margin);
-    gap: var(--gutter);
-    overflow-x: auto;
+  .vehicle-selector {
+    position: relative;
+    order: 1;
+  }
+
+  .vehicle-nav-button {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    display: block;
+    width: 38px;
+    min-height: 48px;
+    padding: 0;
     border: 0;
-    scroll-padding-inline: var(--page-margin);
+    background: transparent;
+    color: var(--charcoal);
+    font-family: var(--font-body);
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+
+  .vehicle-nav-button:active { transform: translateY(calc(-50% + 1px)); }
+  .vehicle-nav-button:focus-visible {
+    outline: none;
+    box-shadow: inset 0 -1px var(--charcoal);
+  }
+  .vehicle-nav-previous { left: var(--page-margin); }
+  .vehicle-nav-next { right: var(--page-margin); }
+
+  .vehicle-tabs-wrap {
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin-inline: clamp(68px, 16vw, 160px);
+    padding-inline: 0;
+    scroll-padding-inline: 0;
     scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
   }
 
-  .layer-controls::-webkit-scrollbar {
-    display: none;
+  .vehicle-tabs-wrap::-webkit-scrollbar { display: none; }
+
+  .vehicle-tabs {
+    display: flex;
+    width: max-content;
+    min-width: max-content;
+    min-height: 120px;
+    gap: 0;
   }
 
-  .layer-tab {
-    display: block;
-    width: 222px;
-    min-height: 82px;
-    flex: 0 0 222px;
-    padding: 0;
-    border: 0;
+  .vehicle-tab {
+    width: calc(100vw - (2 * clamp(68px, 16vw, 160px)));
+    flex: 0 0 calc(100vw - (2 * clamp(68px, 16vw, 160px)));
+    min-height: 120px;
+    padding: 22px 0 14px;
+    text-align: center;
     scroll-snap-align: start;
   }
 
-  .layer-tab i {
-    display: none;
+  .vehicle-tab .vehicle-tab-meta { display: none; }
+  .vehicle-tab > small { display: block; margin-top: 8px; }
+
+  .lab-grid,
+  .visual-grid { display: contents; }
+
+  .layer-controls {
+    order: 2;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: auto;
+    margin: 18px var(--page-margin) 26px;
+    padding: 0;
+    gap: 0;
+    overflow: visible;
+    border: 0;
   }
 
+  .layer-tab {
+    position: relative;
+    display: block;
+    width: auto;
+    min-width: 0;
+    min-height: 76px;
+    padding: 10px 14px;
+    border: 0;
+  }
+
+  .layer-tab i { display: none; }
+
   .layer-tab > span {
+    display: block;
     font-size: 18px;
     font-weight: 700;
     line-height: 22px;
@@ -1196,34 +1315,73 @@ img { display: block; max-width: 100%; }
   }
 
   .layer-tab:hover,
-  .layer-tab:focus-visible,
+  .layer-tab:focus-visible { background: transparent; }
+
+  .layer-tab:focus-visible {
+    outline: none;
+    box-shadow: inset 1px 0 var(--charcoal);
+  }
+
   .layer-tab.is-active {
     background: transparent;
     box-shadow: none;
   }
+
+  .layer-tab.is-active > span {
+    position: relative;
+  }
+
+  .layer-tab.is-active > span::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -14px;
+    width: 1px;
+    background: var(--layer-color);
+  }
+
+  .boundary-figure {
+    order: 3;
+    width: 100%;
+  }
+
+  .map-stage {
+    height: min(62dvh, 720px);
+    aspect-ratio: auto;
+    border-right: 0;
+    border-left: 0;
+  }
+
+  .orientation { fill: #68686b; font-size: 15px; }
+  .visible-layer text,
+  .digital-layer text,
+  .reported-layer text { font-size: 15px; }
+  .parking-layer text { font-size: 14px; }
+
+  .vehicle-summary {
+    order: 4;
+    width: auto;
+    max-width: none;
+    margin: 42px var(--page-margin) 0;
+  }
+
+  .information-panel {
+    order: 5;
+    width: auto;
+    margin: 42px var(--page-margin) 0;
+    padding: 40px 0 0;
+  }
+
+  .information-panel .panel-description,
+  .information-panel dd {
+    font-size: 14px;
+    line-height: 18px;
+  }
 }
 
-/* iPad: keep both selector rows inside the responsive page margins. */
+/* iPad portrait: the active vehicle stays centred, six layers use a 3 by 2 grid. */
 @media (min-width: 768px) and (max-width: 1099px) {
-  .vehicle-tabs-wrap {
-    overflow-x: visible;
-    scroll-snap-type: none;
-  }
-
-  .vehicle-tabs {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    width: 100%;
-    min-width: 0;
-    gap: var(--gutter);
-  }
-
-  .vehicle-tab {
-    width: auto;
-    min-width: 0;
-    flex: none;
-  }
-
   .vehicle-tab > .display {
     overflow: visible;
     font-size: clamp(23px, 3vw, 32px);
@@ -1232,77 +1390,85 @@ img { display: block; max-width: 100%; }
   }
 
   .vehicle-tab > small {
-    display: block;
-    margin-top: 8px;
     font-size: clamp(11px, 1.55vw, 14px);
     line-height: 1.25;
   }
+}
+
+/* iPad landscape: controls and evidence sit beside the full vehicle map. */
+@media (min-width: 900px) and (max-width: 1099px) and (orientation: landscape) {
+  .boundary-lab {
+    display: grid;
+    grid-template-columns: minmax(270px, 32%) minmax(0, 1fr);
+    column-gap: var(--gutter);
+    align-items: start;
+    padding-inline: var(--page-margin);
+  }
+
+  .vehicle-selector {
+    grid-column: 1 / -1;
+    margin-inline: calc(var(--page-margin) * -1);
+  }
 
   .layer-controls {
-    display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    width: 100%;
-    margin: 0 0 46px;
-    padding-inline: 0;
-    gap: var(--gutter);
-    overflow: visible;
-    scroll-snap-type: none;
+    grid-column: 1;
+    grid-row: 2;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 26px 0 0;
   }
 
-  .layer-tab {
-    width: auto;
-    min-width: 0;
-    flex: none;
+  .boundary-figure {
+    grid-column: 2;
+    grid-row: 2 / span 3;
+    margin-top: 26px;
   }
 
-  .layer-tab > span {
-    font-size: clamp(14px, 1.9vw, 18px);
-    line-height: 1.2;
-    overflow-wrap: normal;
+  .map-stage {
+    height: min(70dvh, 700px);
+    border: 1px solid var(--dark-line);
+  }
+
+  .vehicle-summary {
+    grid-column: 1;
+    grid-row: 3;
+    margin: 32px 0 0;
+  }
+
+  .information-panel {
+    grid-column: 1;
+    grid-row: 4;
+    margin: 32px 0 0;
   }
 }
 
-/* Mobile: keep both selector rows as native, touch-scrollable carousels. */
-@media (max-width: 599px) {
-  .vehicle-tabs-wrap,
-  .layer-controls {
-    max-width: 100vw;
-    overflow-x: scroll;
-    overflow-y: hidden;
-    padding-bottom: 10px;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
-    touch-action: pan-x pan-y;
-    scrollbar-width: thin;
-    scrollbar-color: var(--off-white) var(--dark-line);
-    background-image: linear-gradient(var(--dark-line), var(--dark-line));
-    background-repeat: no-repeat;
-    background-position: left bottom;
-    background-size: 100% 1px;
-  }
-
-  .vehicle-tabs-wrap::-webkit-scrollbar,
-  .layer-controls::-webkit-scrollbar {
-    display: block;
-    height: 3px;
-  }
-
-  .vehicle-tabs-wrap::-webkit-scrollbar-track,
-  .layer-controls::-webkit-scrollbar-track {
-    background: var(--dark-line);
-  }
-
-  .vehicle-tabs-wrap::-webkit-scrollbar-thumb,
-  .layer-controls::-webkit-scrollbar-thumb {
-    background: var(--off-white);
-  }
-
-  .vehicle-tabs {
-    width: max-content;
-    min-width: max-content;
+/* Phone: one centred vehicle between simple arrows and a fixed layer grid. */
+@media (max-width: 767px) {
+  .vehicle-tab > .display {
+    overflow: visible;
+    font-size: 40px;
+    line-height: 36px;
+    white-space: normal;
   }
 
   .layer-controls {
-    min-width: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 16px;
   }
+
+  .layer-tab { min-height: 72px; padding: 10px 12px; }
+
+  .layer-tab.is-active > span::before {
+    left: -12px;
+  }
+
+  .map-stage { height: clamp(380px, 58dvh, 520px); }
+
+  .orientation,
+  .visible-layer text,
+  .digital-layer text,
+  .reported-layer text,
+  .parking-layer text { font-size: 18px; }
+
+  .vehicle-summary { margin-top: 36px; }
+  .information-panel { margin-top: 36px; }
 }

@@ -131,6 +131,9 @@ let motionEnabled = false;
 
 const el = {
   tabs: [...document.querySelectorAll('.vehicle-tab')],
+  vehicleTabsWrap: document.querySelector('.vehicle-tabs-wrap'),
+  vehiclePrevious: document.querySelector('.vehicle-nav-previous'),
+  vehicleNext: document.querySelector('.vehicle-nav-next'),
   layerTabs: [...document.querySelectorAll('.layer-tab')],
   stage: document.querySelector('#mapStage'),
   map: document.querySelector('#boundaryMap'),
@@ -163,8 +166,36 @@ const el = {
   panelDescription: document.querySelector('#panelDescription'),
   panelMethod: document.querySelector('#panelMethod'),
   panelLimitation: document.querySelector('#panelLimitation'),
-  panelLinks: document.querySelector('#panelLinks')
+  panelLinks: document.querySelector('#panelLinks'),
+  referenceList: document.querySelector('#reference-list'),
+  referenceToggle: document.querySelector('#referenceToggle')
 };
+
+function initReferenceDisclosure() {
+  if (!el.referenceList || !el.referenceToggle) return;
+
+  const previewCount = 4;
+  const references = [...el.referenceList.children];
+  if (references.length <= previewCount) return;
+
+  const label = el.referenceToggle.querySelector('.reference-toggle-label');
+  const symbol = el.referenceToggle.querySelector('.reference-toggle-symbol');
+
+  const updateDisclosure = (expanded) => {
+    el.referenceList.classList.toggle('is-collapsed', !expanded);
+    el.referenceList.classList.toggle('is-expanded', expanded);
+    el.referenceToggle.setAttribute('aria-expanded', String(expanded));
+    label.textContent = expanded ? 'Show fewer references' : `Show all ${references.length} references`;
+    symbol.textContent = expanded ? '−' : '+';
+    if (window.ScrollTrigger) ScrollTrigger.refresh();
+  };
+
+  el.referenceToggle.hidden = false;
+  updateDisclosure(false);
+  el.referenceToggle.addEventListener('click', () => {
+    updateDisclosure(el.referenceToggle.getAttribute('aria-expanded') !== 'true');
+  });
+}
 
 function mm(value) {
   return `${Math.round(value).toLocaleString('en-GB')} mm`;
@@ -228,7 +259,8 @@ function renderGeometry() {
   const vehicle = vehicles[selectedVehicle];
   const bayLength = Number(el.bayLength.value);
   const bayWidth = Number(el.bayWidth.value);
-  const scale = .114;
+  const compactMap = window.innerWidth <= 1099;
+  const scale = compactMap ? .104 : .108;
   const carHeight = vehicle.length * scale;
   const carWidth = vehicle.width * scale;
   const bayHeight = bayLength * scale;
@@ -264,10 +296,10 @@ function renderGeometry() {
   const outerBottom = Math.min(774, bodyBottom + visibleOuterPadY);
   const visibleRing = el.visibleGraphic.querySelector('#visibleBoundaryRing');
   visibleRing.setAttribute('d', `${roundedRectPath(outerLeft, outerTop, outerRight, outerBottom, 104)} ${roundedRectPath(innerLeft, innerTop, innerRight, innerBottom, 68)}`);
-  el.visibleGraphic.querySelector('text').setAttribute('y', 30);
   el.orientation.setAttribute('x', cx);
-  el.orientation.setAttribute('y', 58);
+  el.orientation.setAttribute('y', compactMap ? 70 : 72);
   el.orientation.setAttribute('text-anchor', 'middle');
+  el.visibleGraphic.querySelector('text').setAttribute('y', compactMap ? 36 : 40);
 
   const digitalGapX = Math.max(62, carWidth * .38);
   const digitalGapY = Math.max(46, carHeight * .1);
@@ -287,7 +319,7 @@ function renderGeometry() {
     digitalCircles[index].setAttribute('cx', x);
     digitalCircles[index].setAttribute('cy', y);
   });
-  el.digitalGraphic.querySelector('text').setAttribute('y', 786);
+  el.digitalGraphic.querySelector('text').setAttribute('y', 770);
 
   el.parkingBay.setAttribute('x', cx - bayPixelWidth / 2);
   el.parkingBay.setAttribute('y', cy - bayHeight / 2);
@@ -299,10 +331,10 @@ function renderGeometry() {
   const rearRightX = bodyRight;
   el.rearLeft.setAttribute('transform', `translate(${rearLeftX} ${rearY})`);
   el.rearRight.setAttribute('transform', `translate(${rearRightX} ${rearY})`);
-  const connectorEndY = 772;
+  const connectorEndY = 744;
   el.rearConnectorLeft.setAttribute('d', `M${rearLeftX} ${rearY + 22}Q${rearLeftX - 16} ${Math.min(rearY + 46, connectorEndY - 14)} ${rearLeftX - 5} ${connectorEndY}`);
   el.rearConnectorRight.setAttribute('d', `M${rearRightX} ${rearY + 22}Q${rearRightX + 16} ${Math.min(rearY + 46, connectorEndY - 14)} ${rearRightX + 5} ${connectorEndY}`);
-  el.reportedLabel.setAttribute('y', 810);
+  el.reportedLabel.setAttribute('y', compactMap ? 798 : 800);
 
   const longitudinal = (bayLength - vehicle.length) / 2;
   const lateral = (bayWidth - vehicle.width) / 2;
@@ -319,10 +351,12 @@ function renderGeometry() {
   el.clearances.front.setAttribute('y', Math.max(70, Math.min(bayTop, carTop) - 16));
   el.clearances.rear.setAttribute('x', cx);
   el.clearances.rear.setAttribute('y', Math.min(742, Math.max(bayBottom, carBottom) + 18));
-  el.clearances.left.setAttribute('x', Math.max(28, Math.min(bayLeft, leftX) - 18));
+  const leftClearanceX = Math.min(bayLeft, leftX) - 18;
+  const rightClearanceX = Math.max(bayRight, rightX) + 18;
+  el.clearances.left.setAttribute('x', compactMap ? Math.max(28, leftClearanceX) : Math.max(80, leftClearanceX));
   el.clearances.left.setAttribute('y', cy + 4);
   el.clearances.left.setAttribute('text-anchor', 'end');
-  el.clearances.right.setAttribute('x', Math.min(872, Math.max(bayRight, rightX) + 18));
+  el.clearances.right.setAttribute('x', compactMap ? Math.min(872, rightClearanceX) : Math.min(820, rightClearanceX));
   el.clearances.right.setAttribute('y', cy + 4);
   el.clearances.right.setAttribute('text-anchor', 'start');
   el.parkingBay.classList.toggle('is-overflow', longitudinal < 0 || lateral < 0);
@@ -332,7 +366,7 @@ function renderGeometry() {
 
 function updateMapViewport() {
   const width = window.innerWidth;
-  if (width <= 599) {
+  if (width <= 767) {
     el.map.setAttribute('viewBox', '150 0 600 820');
   } else if (width <= 1099) {
     el.map.setAttribute('viewBox', '90 0 720 820');
@@ -341,18 +375,62 @@ function updateMapViewport() {
   }
 }
 
-function selectVehicle(key) {
+function scrollVehicleTabIntoView(key) {
+  if (!el.vehicleTabsWrap || window.innerWidth > 1099) return;
+  const button = el.tabs.find((tab) => tab.dataset.vehicle === key);
+  if (!button) return;
+  const padding = parseFloat(getComputedStyle(el.vehicleTabsWrap).paddingLeft) || 0;
+  el.vehicleTabsWrap.scrollTo({
+    left: Math.max(0, button.offsetLeft - padding),
+    behavior: motionEnabled ? 'smooth' : 'auto'
+  });
+}
+
+function selectVehicle(key, { scroll = true } = {}) {
   selectedVehicle = key;
   el.tabs.forEach((button) => {
     const active = button.dataset.vehicle === key;
     button.classList.toggle('is-active', active);
     button.setAttribute('aria-selected', String(active));
+    button.tabIndex = active ? 0 : -1;
   });
+  if (scroll) scrollVehicleTabIntoView(key);
   updateVehicle();
   animateVehicleSelection();
 }
 
 el.tabs.forEach((button) => button.addEventListener('click', () => selectVehicle(button.dataset.vehicle)));
+el.tabs.forEach((button) => button.addEventListener('keydown', (event) => {
+  if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+  event.preventDefault();
+  const current = el.tabs.indexOf(button);
+  const direction = event.key === 'ArrowRight' ? 1 : -1;
+  const next = (current + direction + el.tabs.length) % el.tabs.length;
+  selectVehicle(el.tabs[next].dataset.vehicle);
+  el.tabs[next].focus({ preventScroll: true });
+}));
+el.vehiclePrevious?.addEventListener('click', () => {
+  const current = el.tabs.findIndex((button) => button.dataset.vehicle === selectedVehicle);
+  const previous = (current - 1 + el.tabs.length) % el.tabs.length;
+  selectVehicle(el.tabs[previous].dataset.vehicle);
+});
+el.vehicleNext?.addEventListener('click', () => {
+  const current = el.tabs.findIndex((button) => button.dataset.vehicle === selectedVehicle);
+  const next = (current + 1) % el.tabs.length;
+  selectVehicle(el.tabs[next].dataset.vehicle);
+});
+let vehicleScrollTimer;
+el.vehicleTabsWrap?.addEventListener('scroll', () => {
+  if (window.innerWidth > 1099) return;
+  window.clearTimeout(vehicleScrollTimer);
+  vehicleScrollTimer = window.setTimeout(() => {
+    const left = el.vehicleTabsWrap.scrollLeft;
+    const nearest = el.tabs.reduce((best, button) => (
+      Math.abs(button.offsetLeft - left) < Math.abs(best.offsetLeft - left) ? button : best
+    ));
+    if (nearest.dataset.vehicle !== selectedVehicle) selectVehicle(nearest.dataset.vehicle, { scroll: false });
+  }, 100);
+}, { passive: true });
 el.layerTabs.forEach((button) => button.addEventListener('click', () => updateLayer(button.dataset.layer)));
 document.querySelectorAll('[data-layer-jump]').forEach((target) => {
   const activate = () => updateLayer(target.dataset.layerJump);
@@ -621,7 +699,7 @@ function initMotion() {
         }
       );
 
-      const references = gsap.utils.toArray('.reference-list li');
+      const references = gsap.utils.toArray('.reference-list li').filter((reference) => getComputedStyle(reference).display !== 'none');
       gsap.set(references, { autoAlpha: 0, y: 18 });
       ScrollTrigger.batch(references, {
         start: 'top 92%',
@@ -661,8 +739,12 @@ function initMotion() {
   window.addEventListener('load', refreshMotion, { once: true });
 }
 
-updateVehicle();
+selectVehicle(selectedVehicle, { scroll: false });
 updateLayer('physical');
 updateMapViewport();
-window.addEventListener('resize', updateMapViewport, { passive: true });
+window.addEventListener('resize', () => {
+  updateMapViewport();
+  renderGeometry();
+}, { passive: true });
+initReferenceDisclosure();
 initMotion();
